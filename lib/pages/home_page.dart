@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -9,8 +10,11 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('My Places'),
       ),
-      body: const Center(
-        child: Text('Hello World'),
+      body: GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: LatLng(-12.133306, -76.983687),
+          zoom: 15,
+        ),
       ),
     );
   }
