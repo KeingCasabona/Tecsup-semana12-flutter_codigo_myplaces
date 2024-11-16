@@ -15,6 +15,7 @@ class HomePage extends StatelessWidget {
           target: LatLng(-12.133306, -76.983687),
           zoom: 15,
         ),
+        myLocationEnabled: true,
       ),
     );
   }
