@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:myplaces/pages/home_page.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:myplaces/pages/permission_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -11,7 +12,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'My Places',
-      home: HomePage(),
+      theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme(),
+      ),
+      home: PermissionPage(),
     );
   }
 }
