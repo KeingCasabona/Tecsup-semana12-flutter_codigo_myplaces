@@ -1,8 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:myplaces/pages/home_page.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class PermissionPage extends StatelessWidget {
-  const PermissionPage({super.key});
+class PermissionPage extends StatefulWidget {
+  @override
+  State<PermissionPage> createState() => _PermissionPageState();
+}
+
+class _PermissionPageState extends State<PermissionPage> {
+  checkPermission(PermissionStatus status, BuildContext context) {
+    switch (status) {
+      case PermissionStatus.granted:
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+        break;
+      case PermissionStatus.restricted:
+      case PermissionStatus.denied:
+      case PermissionStatus.permanentlyDenied:
+      case PermissionStatus.limited:
+        openAppSettings();
+        break;
+      default: // PermissionStatus.undetermined
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +66,10 @@ class PermissionPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () async {
+                PermissionStatus status = await Permission.location.request();
+                checkPermission(status, context);
+              },
               child: Text('Activar GPS'),
             )
           ],
