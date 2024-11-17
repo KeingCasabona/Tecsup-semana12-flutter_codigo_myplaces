@@ -51,15 +51,19 @@ class _HomePageState extends State<HomePage> {
                       googleMapController = controller;
                       googleMapController.setMapStyle(jsonEncode(mapStyle));
                     },
-                    onTap: (LatLng position) {
+                    onTap: (LatLng position) async {
                       MarkerId myMarkerId =
                           MarkerId(_markers.length.toString());
                       Marker myMarker = Marker(
                         markerId: myMarkerId,
                         position: position,
+                        // icon: BitmapDescriptor.defaultMarkerWithHue(
+                        //     BitmapDescriptor.hueGreen),
+                        icon: await BitmapDescriptor.fromAssetImage(
+                            ImageConfiguration(), 'assets/images/marker2.png'),
                         //ARRASTRAR EL MARCADOR:
                         draggable: true,
-                        onDragEnd: (LatLng newPosition) {},
+                        onDrag: (LatLng newPosition) {},
                         onTap: () {
                           print('Holaaaaa');
                         },
