@@ -13,6 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Set<Marker> _markers = {};
   late GoogleMapController googleMapController;
 
   Future<CameraPosition> initCurretLocation() async {
@@ -50,6 +51,23 @@ class _HomePageState extends State<HomePage> {
                       googleMapController = controller;
                       googleMapController.setMapStyle(jsonEncode(mapStyle));
                     },
+                    onTap: (LatLng position) {
+                      MarkerId myMarkerId =
+                          MarkerId(_markers.length.toString());
+                      Marker myMarker = Marker(
+                        markerId: myMarkerId,
+                        position: position,
+                        //ARRASTRAR EL MARCADOR:
+                        draggable: true,
+                        onDragEnd: (LatLng newPosition) {},
+                        onTap: () {
+                          print('Holaaaaa');
+                        },
+                      );
+                      _markers.add(myMarker);
+                      setState(() {});
+                    },
+                    markers: _markers,
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
