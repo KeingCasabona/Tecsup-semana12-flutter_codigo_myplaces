@@ -1,6 +1,10 @@
 import 'dart:convert';
-
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/file.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:myplaces/utils/map_style.dart';
@@ -31,6 +35,31 @@ class _HomePageState extends State<HomePage> {
     googleMapController.animateCamera(cameraUpdate);
   }
 
+  Future<Uint8List> imageToBytes(
+    String path,
+    //VALORES POR DEFECTO:
+    {
+    bool fromNetwork = false,
+    int width = 100,
+  }) async {
+    late Uint8List bytes;
+
+    if (fromNetwork) {
+      File file = await DefaultCacheManager().getSingleFile(path);
+      bytes = await file.readAsBytes();
+    } else {
+      ByteData byteData = await rootBundle.load(path);
+      bytes = byteData.buffer.asUint8List();
+    }
+    final codec = await ui.instantiateImageCodec(bytes, targetWidth: width);
+    ui.FrameInfo frame = await codec.getNextFrame();
+
+    ByteData? myByteData =
+        await frame.image.toByteData(format: ui.ImageByteFormat.png);
+
+    return myByteData!.buffer.asUint8List();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,8 +88,15 @@ class _HomePageState extends State<HomePage> {
                         position: position,
                         // icon: BitmapDescriptor.defaultMarkerWithHue(
                         //     BitmapDescriptor.hueGreen),
-                        icon: await BitmapDescriptor.fromAssetImage(
-                            ImageConfiguration(), 'assets/images/marker2.png'),
+                        // icon: await BitmapDescriptor.fromAssetImage(
+                        //     ImageConfiguration(), 'assets/images/marker2.png'),
+
+                        icon: BitmapDescriptor.fromBytes(
+                          await imageToBytes(
+                              'https://w7.pngwing.com/pngs/708/311/png-transparent-icon-logo-twitter-logo-twitter-logo-blue-social-media-area-thumbnail.png',
+                              width: 200,
+                              fromNetwork: true),
+                        ),
                         //ARRASTRAR EL MARCADOR:
                         draggable: true,
                         onDrag: (LatLng newPosition) {},
