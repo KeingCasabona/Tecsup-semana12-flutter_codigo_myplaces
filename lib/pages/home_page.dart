@@ -18,7 +18,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Set<Marker> _markers = {};
+  Set<Polyline> _polylines = {};
+  List<LatLng> _positions = [];
+
   late GoogleMapController googleMapController;
+
+  @override
+  void initState() {
+    super.initState();
+    currentPosition();
+  }
 
   Future<CameraPosition> initCurretLocation() async {
     Position currentPosition = await Geolocator.getCurrentPosition();
@@ -60,6 +69,22 @@ class _HomePageState extends State<HomePage> {
     return myByteData!.buffer.asUint8List();
   }
 
+  currentPosition() {
+    Polyline myPolyline = Polyline(
+      polylineId: PolylineId('my_route'),
+      color: Colors.redAccent,
+      width: 10,
+      points: _positions,
+    );
+
+    _polylines.add(myPolyline);
+    Geolocator.getPositionStream().listen((Position position) {
+      LatLng latLng = LatLng(position.latitude, position.longitude);
+      _positions.add(latLng);
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,6 +110,7 @@ class _HomePageState extends State<HomePage> {
                           MarkerId(_markers.length.toString());
                       Marker myMarker = Marker(
                         markerId: myMarkerId,
+
                         position: position,
                         // icon: BitmapDescriptor.defaultMarkerWithHue(
                         //     BitmapDescriptor.hueGreen),
@@ -108,6 +134,7 @@ class _HomePageState extends State<HomePage> {
                       setState(() {});
                     },
                     markers: _markers,
+                    polylines: _polylines,
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
