@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
   List<LatLng> _positions = [];
+  Position? lastPosition;
 
   late GoogleMapController googleMapController;
 
@@ -69,11 +70,15 @@ class _HomePageState extends State<HomePage> {
     return myByteData!.buffer.asUint8List();
   }
 
-  currentPosition() {
+  currentPosition() async {
+    BitmapDescriptor positionIcon = BitmapDescriptor.fromBytes(await imageToBytes(
+        'https://w7.pngwing.com/pngs/486/496/png-transparent-top-view-plan-view-top-view-plan-view-overlook.png',
+        fromNetwork: true,
+        width: 150));
     Polyline myPolyline = Polyline(
       polylineId: PolylineId('my_route'),
-      color: Colors.redAccent,
-      width: 10,
+      color: Colors.pinkAccent,
+      width: 7,
       points: _positions,
     );
 
@@ -81,6 +86,30 @@ class _HomePageState extends State<HomePage> {
     Geolocator.getPositionStream().listen((Position position) {
       LatLng latLng = LatLng(position.latitude, position.longitude);
       _positions.add(latLng);
+
+      //LA CAMARA SE MUEVE A LA POSICION ACTUAL:
+      CameraUpdate cameraUpdate = CameraUpdate.newLatLng(latLng);
+      googleMapController.animateCamera(cameraUpdate);
+
+      double rotation = 0;
+      if (lastPosition != null) {
+        rotation = Geolocator.bearingBetween(
+          lastPosition!.latitude,
+          lastPosition!.longitude,
+          latLng.latitude,
+          latLng.longitude,
+        );
+      }
+
+      Marker positionMarker = Marker(
+        markerId: MarkerId('positionMarker'),
+        position: latLng,
+        icon: positionIcon,
+        rotation: rotation,
+      );
+      _markers.add(positionMarker);
+      lastPosition = position;
+
       setState(() {});
     });
   }
@@ -99,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   GoogleMap(
                     initialCameraPosition: snap.data,
-                    myLocationEnabled: true,
+                    myLocationEnabled: false,
                     myLocationButtonEnabled: false,
                     onMapCreated: (GoogleMapController controller) {
                       googleMapController = controller;
